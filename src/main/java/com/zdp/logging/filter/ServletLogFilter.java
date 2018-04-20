@@ -5,6 +5,7 @@ import com.zdp.logging.util.MDCUtil;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -14,7 +15,8 @@ public class ServletLogFilter implements Filter{
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        String traceId = servletRequest.getParameter(ParamEnum.TRACE_ID);
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        String traceId = request.getHeader(ParamEnum.TRACE_ID);
         if (StringUtils.isEmpty(traceId)) {
             traceId = UUID.randomUUID().toString();
         }
