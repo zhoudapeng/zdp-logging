@@ -74,6 +74,14 @@ public class HttpClientUtil {
                 e.printStackTrace();
             }
         }
+
+        String orderId = "";
+
+        ThreadLocal<String> orderIdHolder = new ThreadLocal<String>();
+        orderIdHolder.set("12345678");
+        logger.info("insert into db success,orderId=" + orderIdHolder.get());
+        logger.info("send email success,orderId=" + orderIdHolder.get());
+
         logger.info("http get request,url=" + url + ",params=" + param  + ",response=" + resultString + ",time cost=" + (endTime - startTime) + "ms");
         return resultString;
     }
