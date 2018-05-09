@@ -13,6 +13,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,14 +28,18 @@ import java.util.Map;
  * Time 下午4:46
  */
 public class HttpClientUtil {
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
     public static String doGet(String url, Map<String, String> param) {
+
 
         // 创建Httpclient对象
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         String resultString = "";
         CloseableHttpResponse response = null;
+        long startTime = 0;
+        long endTime = 0;
         try {
             // 创建uri
             URIBuilder builder = new URIBuilder(url);
@@ -48,9 +54,10 @@ public class HttpClientUtil {
             HttpGet httpGet = new HttpGet(uri);
             String traceId = TraceIdUtil.getTraceId();
             httpGet.addHeader(ParamEnum.TRACE_ID,traceId);
-
+            startTime = System.currentTimeMillis();
             // 执行请求
             response = httpclient.execute(httpGet);
+            endTime = System.currentTimeMillis();
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
                 resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -67,6 +74,7 @@ public class HttpClientUtil {
                 e.printStackTrace();
             }
         }
+        logger.info("http get request,url=" + url + ",params=" + param  + ",response=" + resultString + ",time cost=" + (endTime - startTime) + "ms");
         return resultString;
     }
 
@@ -79,6 +87,8 @@ public class HttpClientUtil {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         String resultString = "";
+        long startTime = 0;
+        long endTime = 0;
         try {
             // 创建Http Post请求
             HttpPost httpPost = new HttpPost(url);
@@ -95,7 +105,9 @@ public class HttpClientUtil {
                 httpPost.setEntity(entity);
             }
             // 执行http请求
+            startTime = System.currentTimeMillis();
             response = httpClient.execute(httpPost);
+            endTime = System.currentTimeMillis();
             resultString = EntityUtils.toString(response.getEntity(), "utf-8");
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +119,7 @@ public class HttpClientUtil {
                 e.printStackTrace();
             }
         }
-
+        logger.info("http get request,url=" + url + ",params=" + param + ",time cost="  + (endTime - startTime) + "ms" );
         return resultString;
     }
 
@@ -120,6 +132,8 @@ public class HttpClientUtil {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         String resultString = "";
+        long startTime = 0;
+        long endTime = 0;
         try {
             // 创建Http Post请求
             HttpPost httpPost = new HttpPost(url);
@@ -129,7 +143,9 @@ public class HttpClientUtil {
             StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             httpPost.setEntity(entity);
             // 执行http请求
+            startTime = System.currentTimeMillis();
             response = httpClient.execute(httpPost);
+            endTime = System.currentTimeMillis();
             resultString = EntityUtils.toString(response.getEntity(), "utf-8");
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,7 +157,7 @@ public class HttpClientUtil {
                 e.printStackTrace();
             }
         }
-
+        logger.info("http postjson request,url=" + url + ",param=" + json + ",time cost="  + (endTime - startTime) + "ms" );
         return resultString;
     }
 }
